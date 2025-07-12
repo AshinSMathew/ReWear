@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -11,13 +10,41 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Upload, X, Plus, Camera, AlertCircle } from "lucide-react"
+import { Leaf, Upload, X, Plus, Camera, AlertCircle, Loader2, CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+
+interface FormData {
+  title: string
+  description: string
+  category: string
+  type: string
+  size: string
+  condition: string
+  pointsValue: number
+}
 
 export default function AddItem() {
-  const [images, setImages] = useState<string[]>([])
+  const router = useRouter()
+  const [images, setImages] = useState<File[]>([])
+  const [imagePreview, setImagePreview] = useState<string[]>([])
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState("")
+  
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    description: "",
+    category: "",
+    type: "",
+    size: "",
+    condition: "",
+    pointsValue: 25
+  })
+
+  const userId = 3;
 
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -33,14 +60,148 @@ export default function AddItem() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files) {
-      // In a real app, you'd upload these files and get URLs back
-      const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
-      setImages([...images, ...newImages].slice(0, 5)) // Max 5 images
+      const newFiles = Array.from(files)
+      const totalImages = images.length + newFiles.length
+      
+      if (totalImages > 5) {
+        setError("Maximum 5 images allowed")
+        return
+      }
+
+      setImages([...images, ...newFiles])
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file))
+      setImagePreview([...imagePreview, ...newPreviews])
+      
+      setError("")
     }
   }
 
   const removeImage = (index: number) => {
+    URL.revokeObjectURL(imagePreview[index])
+    
     setImages(images.filter((_, i) => i !== index))
+    setImagePreview(imagePreview.filter((_, i) => i !== index))
+  }
+
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+
+    if (field === 'category' || field === 'condition') {
+      const categoryMultiplier = {
+        'outerwear': 1.5,
+        'dresses': 1.3,
+        'shoes': 1.2,
+        'bags': 1.4,
+        'tops': 1.0,
+        'bottoms': 1.1,
+        'accessories': 0.8
+      }
+      
+      const conditionMultiplier = {
+        'like-new': 1.5,
+        'excellent': 1.2,
+        'good': 1.0,
+        'fair': 0.7
+      }
+      
+      const category = field === 'category' ? value as string : formData.category
+      const condition = field === 'condition' ? value as string : formData.condition
+      
+      if (category && condition) {
+        const basePoints = 20
+        const categoryMult = categoryMultiplier[category as keyof typeof categoryMultiplier] || 1
+        const conditionMult = conditionMultiplier[condition as keyof typeof conditionMultiplier] || 1
+        const estimatedPoints = Math.round(basePoints * categoryMult * conditionMult)
+        
+        setFormData(prev => ({ ...prev, pointsValue: estimatedPoints }))
+      }
+    }
+  }
+
+  const validateForm = () => {
+    if (!formData.title.trim()) return "Title is required"
+    if (!formData.description.trim()) return "Description is required"
+    if (!formData.category) return "Category is required"
+    if (!formData.type) return "Type is required"
+    if (!formData.size) return "Size is required"
+    if (!formData.condition) return "Condition is required"
+    if (images.length === 0) return "At least one image is required"
+    return null
+  }
+
+  const handleSubmit = async (isDraft = false) => {
+    const validationError = validateForm()
+    if (validationError && !isDraft) {
+      setError(validationError)
+      return
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const submitFormData = new FormData()
+
+      submitFormData.append("title", formData.title)
+      submitFormData.append("description", formData.description)
+      submitFormData.append("category", formData.category)
+      submitFormData.append("type", formData.type)
+      submitFormData.append("size", formData.size)
+      submitFormData.append("condition", formData.condition)
+      submitFormData.append("pointsValue", formData.pointsValue.toString())
+      submitFormData.append("userId", userId.toString())
+      submitFormData.append("tags", JSON.stringify(tags))
+      submitFormData.append("isDraft", isDraft.toString())
+
+      images.forEach((image) => {
+        submitFormData.append("images", image)
+      })
+
+      const response = await fetch("/api/add-item", {
+        method: "POST",
+        body: submitFormData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to submit item")
+      }
+
+      const result = await response.json()
+      setIsSuccess(true)
+
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 2000)
+
+    } catch (error) {
+      console.error("Error submitting item:", error)
+      setError(error instanceof Error ? error.message : "An error occurred")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-green-800 mb-2">Success!</h2>
+            <p className="text-green-700 mb-4">
+              Your item has been submitted successfully and is under review.
+            </p>
+            <Button 
+              onClick={() => router.push("/dashboard")}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -77,7 +238,16 @@ export default function AddItem() {
           </p>
         </div>
 
-        <form className="space-y-8">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-red-700">{error}</span>
+            </div>
+          </div>
+        )}
+
+        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
           {/* Image Upload */}
           <Card className="border-green-200">
             <CardHeader>
@@ -86,10 +256,10 @@ export default function AddItem() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {images.map((image, index) => (
+                {imagePreview.map((preview, index) => (
                   <div key={index} className="relative group">
                     <Image
-                      src={image || "/placeholder.svg"}
+                      src={preview}
                       alt={`Upload ${index + 1}`}
                       width={200}
                       height={200}
@@ -111,7 +281,13 @@ export default function AddItem() {
                   <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-green-300 rounded-lg cursor-pointer hover:border-green-400 transition-colors">
                     <Camera className="w-8 h-8 text-green-500 mb-2" />
                     <span className="text-sm text-green-600">Add Photo</span>
-                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleImageUpload}
+                    />
                   </label>
                 )}
               </div>
@@ -136,6 +312,8 @@ export default function AddItem() {
                 </Label>
                 <Input
                   id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="e.g., Vintage Denim Jacket"
                   className="border-green-200 focus:border-green-500"
                 />
@@ -147,6 +325,8 @@ export default function AddItem() {
                 </Label>
                 <Textarea
                   id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe your item in detail. Include brand, fit, styling tips, or any special features..."
                   rows={4}
                   className="border-green-200 focus:border-green-500"
@@ -158,7 +338,7 @@ export default function AddItem() {
                   <Label htmlFor="category" className="text-green-700">
                     Category *
                   </Label>
-                  <Select>
+                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                     <SelectTrigger className="border-green-200">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -178,7 +358,7 @@ export default function AddItem() {
                   <Label htmlFor="type" className="text-green-700">
                     Type *
                   </Label>
-                  <Select>
+                  <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
                     <SelectTrigger className="border-green-200">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
@@ -202,7 +382,7 @@ export default function AddItem() {
                   <Label htmlFor="size" className="text-green-700">
                     Size *
                   </Label>
-                  <Select>
+                  <Select value={formData.size} onValueChange={(value) => handleInputChange('size', value)}>
                     <SelectTrigger className="border-green-200">
                       <SelectValue placeholder="Select size" />
                     </SelectTrigger>
@@ -222,7 +402,7 @@ export default function AddItem() {
                   <Label htmlFor="condition" className="text-green-700">
                     Condition *
                   </Label>
-                  <Select>
+                  <Select value={formData.condition} onValueChange={(value) => handleInputChange('condition', value)}>
                     <SelectTrigger className="border-green-200">
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
@@ -287,7 +467,7 @@ export default function AddItem() {
                   <p className="text-sm text-green-600">Based on category, condition, and brand</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-green-800">20-30</div>
+                  <div className="text-2xl font-bold text-green-800">{formData.pointsValue}</div>
                   <div className="text-sm text-green-600">points</div>
                 </div>
               </div>
@@ -300,15 +480,19 @@ export default function AddItem() {
               type="button"
               variant="outline"
               className="flex-1 border-green-600 text-green-600 bg-transparent"
-              onClick={() => {
-                // Save as draft logic
-                console.log("Saving as draft...")
-              }}
+              onClick={() => handleSubmit(true)}
+              disabled={isLoading}
             >
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Save as Draft
             </Button>
-            <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
-              <Upload className="w-4 h-4 mr-2" />
+            <Button 
+              type="button" 
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              onClick={() => handleSubmit(false)}
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
               Submit for Review
             </Button>
           </div>
