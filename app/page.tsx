@@ -64,10 +64,14 @@ export default function LandingPage() {
             </Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" className="text-green-700">
-              Sign In
-            </Button>
-            <Button className="bg-green-600 hover:bg-green-700">Join Now</Button>
+            <Link href="/auth/login">
+              <Button variant="ghost" className="text-green-700">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/auth/signup">
+              <Button className="bg-green-600 hover:bg-green-700">Join Now</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -84,17 +88,21 @@ export default function LandingPage() {
             fashion lovers making a difference, one swap at a time.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8">
-              Start Swapping
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 bg-transparent"
-            >
-              Browse Items
-            </Button>
+            <Link href="/auth/signup">
+              <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8">
+                Start Swapping
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/browse">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-green-600 text-green-600 hover:bg-green-50 text-lg px-8 bg-transparent"
+              >
+                Browse Items
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -160,9 +168,11 @@ export default function LandingPage() {
                   <h3 className="font-semibold text-green-800 mb-2">{item.title}</h3>
                   <div className="flex items-center justify-between">
                     <span className="text-green-600 font-bold">{item.points} points</span>
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                      View Details
-                    </Button>
+                    <Link href={`/item/${item.id}`}>
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
@@ -170,9 +180,11 @@ export default function LandingPage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent">
-            View All Items
-          </Button>
+          <Link href="/browse">
+            <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent">
+              View All Items
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -184,10 +196,12 @@ export default function LandingPage() {
             Join thousands of fashion lovers who are already making sustainable choices. List your items, earn points,
             and discover your next favorite piece.
           </p>
-          <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8">
-            List an Item
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+          <Link href="/add-item">
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8">
+              List an Item
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 

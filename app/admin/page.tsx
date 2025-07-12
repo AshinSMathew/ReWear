@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Leaf, Search, Check, X, Eye, AlertTriangle, Clock, CheckCircle, XCircle, Filter } from "lucide-react"
+import Link from "next/link"
 
 export default function AdminPanel() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -274,14 +275,16 @@ export default function AdminPanel() {
                           </div>
                         </div>
                         <div className="flex gap-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-green-600 text-green-600 bg-transparent"
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Details
-                          </Button>
+                          <Link href={`/admin/item/${item.id}`}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-green-600 text-green-600 bg-transparent"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </Button>
+                          </Link>
                           <Button
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
@@ -357,14 +360,16 @@ export default function AdminPanel() {
                           </div>
                         </div>
                         <div className="flex gap-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="border-green-600 text-green-600 bg-transparent"
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            Investigate
-                          </Button>
+                          <Link href={`/admin/investigate/${item.id}`}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-green-600 text-green-600 bg-transparent"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Investigate
+                            </Button>
+                          </Link>
                           <Button size="sm" className="bg-green-600 hover:bg-green-700">
                             <Check className="w-4 h-4 mr-2" />
                             Clear Flag

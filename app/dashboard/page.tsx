@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Leaf, Plus, Star, Package, ArrowUpDown, CheckCircle, Clock, TrendingUp, Award } from "lucide-react"
+import Link from "next/link"
 
 export default function Dashboard() {
   const userItems = [
@@ -85,14 +86,18 @@ export default function Dashboard() {
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-4 h-4 mr-2" />
-              List Item
-            </Button>
-            <Avatar>
-              <AvatarImage src="/placeholder.svg?height=40&width=40" />
-              <AvatarFallback className="bg-green-100 text-green-700">JD</AvatarFallback>
-            </Avatar>
+            <Link href="/add-item">
+              <Button className="bg-green-600 hover:bg-green-700">
+                <Plus className="w-4 h-4 mr-2" />
+                List Item
+              </Button>
+            </Link>
+            <Link href="/profile">
+              <Avatar>
+                <AvatarImage src="/placeholder.svg?height=40&width=40" />
+                <AvatarFallback className="bg-green-100 text-green-700">JD</AvatarFallback>
+              </Avatar>
+            </Link>
           </div>
         </div>
       </header>
@@ -170,10 +175,12 @@ export default function Dashboard() {
               <TabsContent value="items" className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-green-800">Your Listed Items</h3>
-                  <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add New Item
-                  </Button>
+                  <Link href="/add-item">
+                    <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Item
+                    </Button>
+                  </Link>
                 </div>
                 <div className="space-y-4">
                   {userItems.map((item) => (
@@ -208,9 +215,11 @@ export default function Dashboard() {
                               {item.status}
                             </Badge>
                             <div className="mt-2">
-                              <Button size="sm" variant="outline">
-                                Edit
-                              </Button>
+                              <Link href={`/item/${item.id}/edit`}>
+                                <Button size="sm" variant="outline">
+                                  Edit
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         </div>
@@ -320,9 +329,11 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
-                  Edit Profile
-                </Button>
+                <Link href="/profile/edit">
+                  <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
+                    Edit Profile
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 
@@ -359,16 +370,22 @@ export default function Dashboard() {
                 <CardTitle className="text-green-800">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full bg-green-600 hover:bg-green-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  List New Item
-                </Button>
-                <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
-                  Browse Items
-                </Button>
-                <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
-                  View Messages
-                </Button>
+                <Link href="/add-item">
+                  <Button className="w-full bg-green-600 hover:bg-green-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    List New Item
+                  </Button>
+                </Link>
+                <Link href="/browse">
+                  <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
+                    Browse Items
+                  </Button>
+                </Link>
+                <Link href="/messages">
+                  <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
+                    View Messages
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

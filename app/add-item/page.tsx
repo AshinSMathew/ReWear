@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Upload, X, Plus, Camera, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export default function AddItem() {
   const [images, setImages] = useState<string[]>([])
@@ -54,12 +55,16 @@ export default function AddItem() {
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-green-700">
-              Dashboard
-            </Button>
-            <Button variant="ghost" className="text-green-700">
-              Browse
-            </Button>
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-green-700">
+                Dashboard
+              </Button>
+            </Link>
+            <Link href="/browse">
+              <Button variant="ghost" className="text-green-700">
+                Browse
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -291,7 +296,15 @@ export default function AddItem() {
 
           {/* Submit Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
-            <Button type="button" variant="outline" className="flex-1 border-green-600 text-green-600 bg-transparent">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 border-green-600 text-green-600 bg-transparent"
+              onClick={() => {
+                // Save as draft logic
+                console.log("Saving as draft...")
+              }}
+            >
               Save as Draft
             </Button>
             <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">

@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
+import Link from "next/link"
 
 export default function ItemDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -33,6 +34,7 @@ export default function ItemDetail() {
   ]
 
   const item = {
+    id: "123",
     title: "Vintage Denim Jacket",
     description:
       "Beautiful vintage denim jacket in excellent condition. This classic piece features authentic distressing and a perfect fit. Originally from a premium brand, it's been well-maintained and is ready for its next adventure. Perfect for layering and adds a timeless touch to any outfit.",
@@ -77,10 +79,14 @@ export default function ItemDetail() {
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-green-700">
-              Browse
-            </Button>
-            <Button className="bg-green-600 hover:bg-green-700">Dashboard</Button>
+            <Link href="/browse">
+              <Button variant="ghost" className="text-green-700">
+                Browse
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button className="bg-green-600 hover:bg-green-700">Dashboard</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -227,18 +233,24 @@ export default function ItemDetail() {
                   <Package className="w-8 h-8 text-green-600" />
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                    <ArrowUpDown className="w-4 h-4 mr-2" />
-                    Request Swap
-                  </Button>
-                  <Button variant="outline" className="flex-1 border-green-600 text-green-600 bg-transparent">
-                    Redeem with Points
-                  </Button>
+                  <Link href={`/swap/request/${item.id}`} className="flex-1">
+                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                      <ArrowUpDown className="w-4 h-4 mr-2" />
+                      Request Swap
+                    </Button>
+                  </Link>
+                  <Link href={`/redeem/${item.id}`} className="flex-1">
+                    <Button variant="outline" className="w-full border-green-600 text-green-600 bg-transparent">
+                      Redeem with Points
+                    </Button>
+                  </Link>
                 </div>
-                <Button variant="ghost" className="w-full mt-2 text-green-600">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Message Owner
-                </Button>
+                <Link href={`/messages/new?user=${uploader.name}`}>
+                  <Button variant="ghost" className="w-full mt-2 text-green-600">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Message Owner
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -276,13 +288,17 @@ export default function ItemDetail() {
                   <span>Member since {uploader.memberSince}</span>
                 </div>
                 <div className="flex gap-3">
-                  <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
-                    View Profile
-                  </Button>
-                  <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Send Message
-                  </Button>
+                  <Link href={`/profile/${uploader.name}`}>
+                    <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
+                      View Profile
+                    </Button>
+                  </Link>
+                  <Link href={`/messages/new?user=${uploader.name}`}>
+                    <Button variant="outline" className="border-green-600 text-green-600 bg-transparent">
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Send Message
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
