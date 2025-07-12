@@ -174,7 +174,8 @@ export async function POST(request: NextRequest) {
         [updatedItem] = await Promise.all([
           db`
             UPDATE items
-            SET status = 'approved'
+            SET status = 'available',
+            approved = TRUE
             WHERE id = ${itemId}
             RETURNING *
           `,
@@ -185,7 +186,8 @@ export async function POST(request: NextRequest) {
         [updatedItem] = await Promise.all([
           db`
             UPDATE items
-            SET status = 'rejected'
+            SET status = 'rejected',
+            approved = FALSE
             WHERE id = ${itemId}
             RETURNING *
           `,
