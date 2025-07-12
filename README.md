@@ -95,14 +95,14 @@ Visit `http://localhost:3000` to view the app.
 
 ## Screenshots
 
-![Homepage](./screenshots/home.png)
+![Homepage](./screenshots/Home.png)
 HOME PAGE
 
-![Login page](./screenshots/login.png)
+![Login page](./screenshots/Login.png)
 LOGIN PAGE
 
 #### Client Side
-![Browse](./screenshots/browse.png)
+![Browse](./screenshots/Browse.png)
 BROWSE PAGE
 
 ![dashboard](./screenshots/User_dashboard.png)
