@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Verify password - with additional validation
+    // Verify password
     const storedHash = user[0].password;
     if (!storedHash || typeof storedHash !== 'string') {
       return NextResponse.json(

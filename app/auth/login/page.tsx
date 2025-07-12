@@ -1,25 +1,26 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Leaf, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
   
     try {
       const response = await fetch('/api/auth/login', {
@@ -28,9 +29,21 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password, rememberMe })
       })
       
-      if (!response.ok) throw new Error('Login failed')
-      window.location.href = "../browse"
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Login failed')
+      }
+
+      const data = await response.json()
+
+      if (data.user.isAdmin) {
+        router.push("/admin")
+      } else {
+        router.push("/browse")
+      }
+      
     } catch (error) {
+      setError(error instanceof Error ? error.message : "Login failed")
     }
   }
 
