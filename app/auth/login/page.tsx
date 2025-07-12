@@ -18,15 +18,19 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt:", { email, password, rememberMe })
-
-    // Simulate successful login and redirect
-    // In a real app, you'd validate credentials first
-    if (email && password) {
-      window.location.href = "/dashboard"
+  
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, rememberMe })
+      })
+      
+      if (!response.ok) throw new Error('Login failed')
+      window.location.href = "../dashboard"
+    } catch (error) {
     }
   }
 

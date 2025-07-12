@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,6 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Leaf, Plus, Star, Package, ArrowUpDown, CheckCircle, Clock, TrendingUp, Award } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const userItems = [
@@ -73,6 +75,28 @@ export default function Dashboard() {
       date: "1 month ago",
     },
   ]
+  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("authToken");
+        router.push("/");
+      } else {
+        console.error("Logout failed:", await response.text());
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      router.push("/");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-green-50">
@@ -92,7 +116,15 @@ export default function Dashboard() {
                 List Item
               </Button>
             </Link>
-            <Link href="/profile">
+            <Button 
+              type="submit" 
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+            <Link href="#">
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
                 <AvatarFallback className="bg-green-100 text-green-700">JD</AvatarFallback>

@@ -29,45 +29,39 @@ export default function SignupPage() {
     newsletter: false,
   })
 
-  // Password strength calculation
-  const calculatePasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength += 25
-    if (/[A-Z]/.test(password)) strength += 25
-    if (/[0-9]/.test(password)) strength += 25
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25
-    return strength
-  }
-
-  const passwordStrength = calculatePasswordStrength(formData.password)
-
-  const getPasswordStrengthColor = (strength: number) => {
-    if (strength < 25) return "bg-red-500"
-    if (strength < 50) return "bg-orange-500"
-    if (strength < 75) return "bg-yellow-500"
-    return "bg-green-500"
-  }
-
-  const getPasswordStrengthText = (strength: number) => {
-    if (strength < 25) return "Weak"
-    if (strength < 50) return "Fair"
-    if (strength < 75) return "Good"
-    return "Strong"
-  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle signup logic here
-    console.log("Signup attempt:", { formData, agreements })
+    
+    if (!isFormValid()) return
 
-    // Simulate successful signup and redirect
-    if (isFormValid()) {
-      // In a real app, you'd create the account first
-      window.location.href = "/auth/welcome"
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          location: formData.location
+        })
+      })
+
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed')
+      }
+
+      window.location.href = "/auth/login"
+      
+    } catch (error) {
+      console.error("Signup error:", error)
     }
   }
 
@@ -78,9 +72,7 @@ export default function SignupPage() {
       formData.email &&
       formData.password &&
       formData.confirmPassword &&
-      formData.password === formData.confirmPassword &&
-      passwordStrength >= 50 &&
-      agreements.terms
+      formData.password === formData.confirmPassword
     )
   }
 
@@ -208,25 +200,6 @@ export default function SignupPage() {
                     )}
                   </Button>
                 </div>
-                {formData.password && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-green-600">Password strength:</span>
-                      <span
-                        className={`font-medium ${passwordStrength >= 75 ? "text-green-600" : passwordStrength >= 50 ? "text-yellow-600" : "text-red-600"}`}
-                      >
-                        {getPasswordStrengthText(passwordStrength)}
-                      </span>
-                    </div>
-                    <Progress
-                      value={passwordStrength}
-                      className="h-2"
-                      style={{
-                        background: "#e5e7eb",
-                      }}
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Confirm Password Field */}
