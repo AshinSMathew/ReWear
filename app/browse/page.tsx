@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react";
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation";
@@ -7,10 +8,32 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Leaf, Search, Filter, Heart, Star } from "lucide-react"
+import { Leaf, Search, Filter, Heart, Star, Package } from "lucide-react"
+
+interface Item {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  itemType: string;
+  size: string;
+  condition: string;
+  pointsValue: number;
+  status: string;
+  createdAt: string;
+  userName: string;
+  location: string;
+}
 
 export default function BrowsePage() {
   const router = useRouter();
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sizeFilter, setSizeFilter] = useState("all");
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
@@ -26,68 +49,67 @@ export default function BrowsePage() {
       router.push("/");
     }
   };
-  const items = [
-    {
-      id: 1,
-      title: "Vintage Denim Jacket",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Excellent",
-      points: 25,
-      category: "Outerwear",
-      size: "M",
-      location: "San Francisco, CA",
-    },
-    {
-      id: 2,
-      title: "Floral Summer Dress",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Good",
-      points: 20,
-      category: "Dresses",
-      size: "S",
-      location: "Los Angeles, CA",
-    },
-    {
-      id: 3,
-      title: "Classic White Sneakers",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Like New",
-      points: 30,
-      category: "Shoes",
-      size: "9",
-      location: "New York, NY",
-    },
-    {
-      id: 4,
-      title: "Wool Knit Sweater",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Good",
-      points: 22,
-      category: "Knitwear",
-      size: "L",
-      location: "Chicago, IL",
-    },
-    {
-      id: 5,
-      title: "Designer Handbag",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Excellent",
-      points: 45,
-      category: "Accessories",
-      size: "One Size",
-      location: "Miami, FL",
-    },
-    {
-      id: 6,
-      title: "Leather Boots",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Good",
-      points: 35,
-      category: "Shoes",
-      size: "8",
-      location: "Seattle, WA",
-    },
-  ]
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch('/api/browse');
+        if (!response.ok) {
+          throw new Error('Failed to fetch items');
+        }
+        const data = await response.json();
+        setItems(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  // Filter items based on search and filters
+  const filteredItems = items.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+    const matchesSize = sizeFilter === "all" || item.size === sizeFilter;
+    
+    return matchesSearch && matchesCategory && matchesSize;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-green-800">Loading items...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+          <p className="mt-4 text-red-600">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 bg-green-600 hover:bg-green-700"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-green-50">
@@ -131,9 +153,14 @@ export default function BrowsePage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-green-500" />
-              <Input placeholder="Search items..." className="pl-10 border-green-200 focus:border-green-500" />
+              <Input 
+                placeholder="Search items..." 
+                className="pl-10 border-green-200 focus:border-green-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="border-green-200">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -147,73 +174,92 @@ export default function BrowsePage() {
                 <SelectItem value="accessories">Accessories</SelectItem>
               </SelectContent>
             </Select>
-            <Select>
+            <Select value={sizeFilter} onValueChange={setSizeFilter}>
               <SelectTrigger className="border-green-200">
                 <SelectValue placeholder="Size" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sizes</SelectItem>
-                <SelectItem value="xs">XS</SelectItem>
-                <SelectItem value="s">S</SelectItem>
-                <SelectItem value="m">M</SelectItem>
-                <SelectItem value="l">L</SelectItem>
-                <SelectItem value="xl">XL</SelectItem>
+                <SelectItem value="XS">XS</SelectItem>
+                <SelectItem value="S">S</SelectItem>
+                <SelectItem value="M">M</SelectItem>
+                <SelectItem value="L">L</SelectItem>
+                <SelectItem value="XL">XL</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-green-600 hover:bg-green-700">
+            <Button 
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                setSearchTerm("");
+                setCategoryFilter("all");
+                setSizeFilter("all");
+              }}
+            >
               <Filter className="w-4 h-4 mr-2" />
-              Apply Filters
+              Reset Filters
             </Button>
           </div>
         </div>
 
         {/* Items Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <Card key={item.id} className="group hover:shadow-lg transition-shadow border-green-100">
-              <CardContent className="p-0">
-                <div className="relative">
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title}
-                    width={300}
-                    height={300}
-                    className="w-full h-64 object-cover rounded-t-lg"
-                  />
-                  <Button size="icon" variant="ghost" className="absolute top-2 right-2 bg-white/80 hover:bg-white">
-                    <Heart className="w-4 h-4" />
-                  </Button>
-                  <Badge className="absolute top-2 left-2 bg-green-600 text-white">{item.points} pts</Badge>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
-                      {item.category}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm text-gray-600">{item.condition}</span>
-                    </div>
+        {filteredItems.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="mx-auto h-12 w-12 text-green-600 mb-4" />
+            <h3 className="text-xl font-semibold text-green-800 mb-2">No items found</h3>
+            <p className="text-green-600 mb-6">Try adjusting your search or filters</p>
+            <Button 
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50"
+              onClick={() => {
+                setSearchTerm("");
+                setCategoryFilter("all");
+                setSizeFilter("all");
+              }}
+            >
+              Clear all filters
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item) => (
+              <Card key={item.id} className="group hover:shadow-lg transition-shadow border-green-100">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <Image
+                      src="/placeholder.svg"
+                      alt={item.title}
+                      width={300}
+                      height={300}
+                      className="w-full h-64 object-cover rounded-t-lg"
+                    />
+                    <Button size="icon" variant="ghost" className="absolute top-2 right-2 bg-white/80 hover:bg-white">
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                    <Badge className="absolute top-2 left-2 bg-green-600 text-white">{item.pointsValue} pts</Badge>
                   </div>
-                  <h3 className="font-semibold text-green-800 mb-1">{item.title}</h3>
-                  <p className="text-sm text-green-600 mb-3">
-                    Size {item.size} • {item.location}
-                  </p>
-                  <Link href={`/item/${item.id}`}>
-                    <Button className="w-full bg-green-600 hover:bg-green-700">View Details</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Load More */}
-        <div className="text-center mt-8">
-          <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent">
-            Load More Items
-          </Button>
-        </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="secondary" className="bg-green-100 text-green-700">
+                        {item.category}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm text-gray-600">{item.condition}</span>
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-green-800 mb-1">{item.title}</h3>
+                    <p className="text-sm text-green-600 mb-3">
+                      Size {item.size} • {item.location}
+                    </p>
+                    <Link href={`/items/${item.id}`}>
+                      <Button className="w-full bg-green-600 hover:bg-green-700">View Details</Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
