@@ -69,7 +69,6 @@ export default function BrowsePage() {
     fetchItems();
   }, []);
 
-  // Filter items based on search and filters
   const filteredItems = items.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          item.description.toLowerCase().includes(searchTerm.toLowerCase());
