@@ -29,7 +29,7 @@ export default function LoginPage() {
       })
       
       if (!response.ok) throw new Error('Login failed')
-      window.location.href = "../dashboard"
+      window.location.href = "../browse"
     } catch (error) {
     }
   }

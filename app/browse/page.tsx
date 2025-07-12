@@ -1,5 +1,7 @@
+"use client"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Leaf, Search, Filter, Heart, Star } from "lucide-react"
 
 export default function BrowsePage() {
+  const router = useRouter();
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      router.push("/");
+    }
+  };
   const items = [
     {
       id: 1,
@@ -82,23 +100,21 @@ export default function BrowsePage() {
             </div>
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-green-700 hover:text-green-800 font-medium">
-              Dashboard
-            </Link>
-            <Link href="/add-item" className="text-green-700 hover:text-green-800 font-medium">
-              List Item
-            </Link>
-          </nav>
           <div className="flex items-center gap-3">
-            <Link href="/auth/login">
-              <Button variant="ghost" className="text-green-700">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button className="bg-green-600 hover:bg-green-700">Join Now</Button>
-            </Link>
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/dashboard" className="text-green-700 hover:text-green-800 font-medium">
+                Dashboard
+              </Link>
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
           </div>
         </div>
       </header>
