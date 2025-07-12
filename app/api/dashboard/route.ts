@@ -28,16 +28,17 @@ export async function GET(request: NextRequest) {
 
     const items = await db`
       SELECT 
-        id, 
-        title, 
-        category, 
-        item_type as "itemType", 
-        size, 
-        condition, 
-        points_value as "pointsValue",
-        status,
-        created_at as "createdAt"
-      FROM items
+        i.id, 
+        i.title, 
+        i.category, 
+        i.item_type as "itemType", 
+        i.size, 
+        i.condition, 
+        i.points_value as "pointsValue",
+        i.status,
+        i.created_at as "createdAt",
+        (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "imageUrl"
+      FROM items i
       WHERE user_id = ${user[0].id}
       ORDER BY created_at DESC
     `;
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
         s.status,
         s.created_at as "createdAt",
         i.title as "itemTitle",
-        u.name as "partnerName"
+        u.name as "partnerName",
+        (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "itemImageUrl"
       FROM swaps s
       JOIN items i ON s.item_id = i.id
       JOIN users u ON s.requester_id = u.id

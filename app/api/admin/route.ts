@@ -179,6 +179,19 @@ export async function POST(request: NextRequest) {
             WHERE id = ${itemId}
             RETURNING *
           `,
+          db`
+            UPDATE users u
+            SET points_balance = points_balance + (
+              SELECT points_value 
+              FROM items 
+              WHERE id = ${itemId}
+            )
+            WHERE u.id = (
+              SELECT user_id 
+              FROM items 
+              WHERE id = ${itemId}
+            )
+          `
         ]);
         break;
 

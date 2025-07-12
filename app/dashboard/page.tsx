@@ -32,6 +32,7 @@ interface DashboardData {
     status: string;
     createdAt: string;
     pointsValue: number;
+    imageUrl: string;
   }>;
   ongoingSwaps: Array<{
     id: string;
@@ -39,6 +40,7 @@ interface DashboardData {
     partnerName: string;
     status: string;
     createdAt: string;
+    itemImageUrl: string;
   }>;
   completedSwaps: Array<{
     id: string;
@@ -277,7 +279,7 @@ export default function Dashboard() {
                         <CardContent className="p-4">
                           <div className="flex items-center gap-4">
                             <Image
-                              src="/placeholder.svg?height=100&width=100"
+                              src={item.imageUrl|| "/placeholder.svg"}
                               alt={item.title}
                               width={80}
                               height={80}

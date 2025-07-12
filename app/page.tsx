@@ -1,46 +1,8 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Leaf, Recycle, Users, ArrowRight, Star, Heart } from "lucide-react"
 
 export default function LandingPage() {
-  const featuredItems = [
-    {
-      id: 1,
-      title: "Vintage Denim Jacket",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Excellent",
-      points: 25,
-      category: "Outerwear",
-    },
-    {
-      id: 2,
-      title: "Floral Summer Dress",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Good",
-      points: 20,
-      category: "Dresses",
-    },
-    {
-      id: 3,
-      title: "Classic White Sneakers",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Like New",
-      points: 30,
-      category: "Shoes",
-    },
-    {
-      id: 4,
-      title: "Wool Knit Sweater",
-      image: "/placeholder.svg?height=300&width=300",
-      condition: "Good",
-      points: 22,
-      category: "Knitwear",
-    },
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
       {/* Header */}
@@ -127,64 +89,6 @@ export default function LandingPage() {
               <div className="text-green-100">CO₂ Saved</div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Featured Items */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-green-800 mb-4">Featured Items</h2>
-          <p className="text-green-700 max-w-2xl mx-auto">
-            Discover amazing pieces from our community. Each item has been carefully curated and is ready for its next
-            adventure.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredItems.map((item) => (
-            <Card key={item.id} className="group hover:shadow-lg transition-shadow border-green-100">
-              <CardContent className="p-0">
-                <div className="relative">
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title}
-                    width={300}
-                    height={300}
-                    className="w-full h-64 object-cover rounded-t-lg"
-                  />
-                  <Button size="icon" variant="ghost" className="absolute top-2 right-2 bg-white/80 hover:bg-white">
-                    <Heart className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary" className="bg-green-100 text-green-700">
-                      {item.category}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm text-gray-600">{item.condition}</span>
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-green-800 mb-2">{item.title}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-600 font-bold">{item.points} points</span>
-                    <Link href={`/item/${item.id}`}>
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                        View Details
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <div className="text-center mt-8">
-          <Link href="/browse">
-            <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 bg-transparent">
-              View All Items
-            </Button>
-          </Link>
         </div>
       </section>
 
