@@ -115,4 +115,7 @@ ADD ITEM PAGE
 ![admin](./screenshots/admin_panel.png)
 ADMIN PAGE
 
+##  Team Members
 
+- **Ann Maria Jaison** - Team Lead - [GitHub](https://github.com/Ann-Maria-Jaison)
+- **Ashin Sabu Mathew** - [GitHub](https://github.com/AshinSMathew)
