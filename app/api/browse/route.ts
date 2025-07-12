@@ -16,7 +16,9 @@ export async function GET(request: Request) {
         i.status,
         i.created_at as "createdAt",
         u.name as "userName",
-        u.location
+        u.location,
+        (SELECT image_url FROM item_images 
+         WHERE item_id = i.id AND is_primary = true LIMIT 1) as "imageUrl"
       FROM items i
       JOIN users u ON i.user_id = u.id
       WHERE i.approved = true

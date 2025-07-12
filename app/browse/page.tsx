@@ -23,6 +23,7 @@ interface Item {
   createdAt: string;
   userName: string;
   location: string;
+  imageUrl: string;
 }
 
 export default function BrowsePage() {
@@ -225,7 +226,7 @@ export default function BrowsePage() {
                 <CardContent className="p-0">
                   <div className="relative">
                     <Image
-                      src="/placeholder.svg"
+                      src={item.imageUrl || "/placeholder.svg"}
                       alt={item.title}
                       width={300}
                       height={300}
