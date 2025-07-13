@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
 
   const publicRoutes = ['/auth/login', '/auth/signup', '/'];
-  const authRoutes = ['/browse', '/add-item','/dashboard'];
+  const protectedRoutes = ['/browse', '/add-item', '/dashboard'];
   const adminRoutes = ['/admin'];
 
   try {
@@ -32,23 +32,25 @@ export async function middleware(req: NextRequest) {
         });
         return response;
       }
+      return NextResponse.next();
+    }
 
+    if (publicRoutes.includes(pathname)) {
+      if (authToken && (pathname === "/auth/login" || pathname === "/auth/signup")) {
+        return NextResponse.redirect(new URL("/browse", req.url));
+      }
       return NextResponse.next();
     }
 
     if (!authToken) {
-      if (publicRoutes.includes(pathname)) {
-        return NextResponse.next();
+      if (protectedRoutes.includes(pathname) || pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL(`/auth/login?redirect=${pathname}`, req.url));
       }
-      return NextResponse.redirect(new URL(`/auth/login?redirect=${pathname}`, req.url));
+      return NextResponse.redirect(new URL("/browse", req.url));
     }
 
     const secretKey = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify(authToken, secretKey);
-
-    if (authToken && (pathname === "/auth/login" || pathname === "/auth/signup")) {
-      return NextResponse.redirect(new URL("/browse", req.url));
-    }
 
     if (adminRoutes.includes(pathname) && !payload.isAdmin) {
       const response = NextResponse.redirect(new URL("/", req.url));
@@ -66,7 +68,7 @@ export async function middleware(req: NextRequest) {
   } catch (error) {
     console.error("Authentication error:", error);
 
-    const response = NextResponse.redirect(new URL("/", req.url));
+    const response = NextResponse.redirect(new URL("/auth/login", req.url));
     response.cookies.delete("authToken");
     response.cookies.set({
       name: "authError",
