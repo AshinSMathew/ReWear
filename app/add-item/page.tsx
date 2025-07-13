@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +33,8 @@ export default function AddItem() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("")
+  const [userId, setUserId] = useState<number | null>(null)
+  const [isLoadingUser, setIsLoadingUser] = useState(true)
   
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -44,7 +46,29 @@ export default function AddItem() {
     pointsValue: 25
   })
 
-  const userId = 3;
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await fetch('/api/add-item', {
+          credentials: 'include'
+        })
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch user ID')
+        }
+        
+        const data = await response.json()
+        setUserId(data.user_id)
+      } catch (error) {
+        console.error('Error fetching user ID:', error)
+        setError('Failed to load user data. Please try again.')
+      } finally {
+        setIsLoadingUser(false)
+      }
+    }
+    
+    fetchUserId()
+  }, [])
 
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -130,6 +154,11 @@ export default function AddItem() {
   }
 
   const handleSubmit = async (isDraft = false) => {
+    if (!userId) {
+      setError("User not authenticated")
+      return
+    }
+
     const validationError = validateForm()
     if (validationError && !isDraft) {
       setError(validationError)
@@ -197,6 +226,36 @@ export default function AddItem() {
               className="bg-green-600 hover:bg-green-700"
             >
               Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-red-800 mb-2">Authentication Required</h2>
+            <p className="text-red-700 mb-4">
+              You need to be logged in to add an item.
+            </p>
+            <Button 
+              onClick={() => router.push("/auth/login")}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Go to Login
             </Button>
           </CardContent>
         </Card>
@@ -350,6 +409,7 @@ export default function AddItem() {
                       <SelectItem value="shoes">Shoes</SelectItem>
                       <SelectItem value="accessories">Accessories</SelectItem>
                       <SelectItem value="bags">Bags</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -372,6 +432,7 @@ export default function AddItem() {
                       <SelectItem value="jeans">Jeans</SelectItem>
                       <SelectItem value="pants">Pants</SelectItem>
                       <SelectItem value="skirt">Skirt</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

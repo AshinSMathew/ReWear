@@ -170,9 +170,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user_id = result[0].id;
-    console.log(user_id)
-    return NextResponse.json({ user_id });
+    return NextResponse.json({ user_id: result[0].id });
     
   } catch (e) {
     console.error("Error in GET /api/user-id:", e);
