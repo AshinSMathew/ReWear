@@ -101,7 +101,7 @@ HOME PAGE
 ![Login page](./screenshots/Login.png)
 LOGIN PAGE
 
-#### Client Side
+### Client Side
 ![Browse](./screenshots/Browse.png)
 BROWSE PAGE
 
@@ -111,7 +111,7 @@ DASHBOARD PAGE
 ![addItem](./screenshots/user_addItem.png)
 ADD ITEM PAGE
 
-#### Admin Side
+### Admin Side
 ![admin](./screenshots/admin_panel.png)
 ADMIN PAGE
 
