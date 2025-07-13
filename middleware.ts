@@ -47,7 +47,7 @@ export async function middleware(req: NextRequest) {
     const { payload } = await jwtVerify(authToken, secretKey);
 
     if (authToken && (pathname === "/auth/login" || pathname === "/auth/signup")) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/browse", req.url));
     }
 
     if (adminRoutes.includes(pathname) && !payload.isAdmin) {
@@ -66,7 +66,7 @@ export async function middleware(req: NextRequest) {
   } catch (error) {
     console.error("Authentication error:", error);
 
-    const response = NextResponse.redirect(new URL("/login", req.url));
+    const response = NextResponse.redirect(new URL("/", req.url));
     response.cookies.delete("authToken");
     response.cookies.set({
       name: "authError",
