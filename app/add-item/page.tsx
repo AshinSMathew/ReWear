@@ -275,16 +275,20 @@ export default function AddItem() {
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" className="text-green-700">
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/dashboard" className="text-green-700 hover:text-green-800 font-medium">
                 Dashboard
-              </Button>
-            </Link>
-            <Link href="/browse">
-              <Button variant="ghost" className="text-green-700">
-                Browse
-              </Button>
-            </Link>
+              </Link>
+            </Button>
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/browse" className="text-green-700 hover:text-green-800 font-medium">
+                Browse Items
+              </Link>
+            </Button>
           </div>
         </div>
       </header>

@@ -150,14 +150,20 @@ export default function ItemDetail() {
             <span className="text-xl font-bold text-green-800">ReWear</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/browse">
-              <Button variant="ghost" className="text-green-700">
-                Browse
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button className="bg-green-600 hover:bg-green-700">Dashboard</Button>
-            </Link>
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/browse" className="text-green-700 hover:text-green-800 font-medium">
+                Browse Items
+              </Link>
+            </Button>
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/dashboard" className="text-green-700 hover:text-green-800 font-medium">
+                Dashboard
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
