@@ -180,7 +180,7 @@ export default function AdminPanel() {
             </Button>
             <Button 
               variant="outline" 
-              className="border-green-600 text-green-600 hover:bg-green-50"
+              className="bg-green-600 hover:bg-green-700 text-white"
               onClick={handleLogout}
             >Logout</Button>
             <Badge variant="secondary" className="bg-red-100 text-red-700">
