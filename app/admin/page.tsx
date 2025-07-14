@@ -221,17 +221,6 @@ export default function AdminPanel() {
             </CardContent>
           </Card>
 
-          <Card className="border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-green-600">Flagged Items</p>
-                  <p className="text-2xl font-bold text-green-800">{stats.flaggedItems}</p>
-                </div>
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-              </div>
-            </CardContent>
-          </Card>
 
           <Card className="border-green-200">
             <CardContent className="p-6">
@@ -264,15 +253,9 @@ export default function AdminPanel() {
         </div>
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-green-100">
+          <TabsList className="grid w-full grid-cols-1 bg-green-100">
             <TabsTrigger value="pending" className="data-[state=active]:bg-white">
               Pending Review ({stats.pendingItems})
-            </TabsTrigger>
-            <TabsTrigger value="flagged" className="data-[state=active]:bg-white">
-              Flagged Items ({stats.flaggedItems})
-            </TabsTrigger>
-            <TabsTrigger value="recent" className="data-[state=active]:bg-white">
-              Recent Actions
             </TabsTrigger>
           </TabsList>
 
@@ -386,177 +369,6 @@ export default function AdminPanel() {
                   <div className="text-center py-8 text-green-600">No pending items to review</div>
                 )}
               </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="flagged" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-green-800">Flagged Items</h3>
-              <p className="text-sm text-green-600">Items reported by community or auto-detection</p>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {flaggedItems.map((item) => (
-                  <Card key={item.id} className="border-red-200 bg-red-50">
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <Image
-                          src={item.imageUrl || "/placeholder.svg"}
-                          alt={item.title}
-                          width={100}
-                          height={100}
-                          className="rounded-lg object-cover"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h4 className="font-semibold text-red-800 text-lg">{item.title}</h4>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Avatar className="w-6 h-6">
-                                  <AvatarImage src={item.uploaderAvatar || "/placeholder.svg"} />
-                                  <AvatarFallback className="bg-red-100 text-red-700 text-xs">
-                                    {item.uploader
-                                      .split(" ")
-                                      .map((n) => n[0])
-                                      .join("")}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <span className="text-sm text-red-600">{item.uploader}</span>
-                              </div>
-                            </div>
-                            <Badge className="bg-red-100 text-red-700">
-                              <AlertTriangle className="w-3 h-3 mr-1" />
-                              Flagged
-                            </Badge>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm">
-                            <div>
-                              <span className="text-red-600">Reason:</span>
-                              <p className="font-medium text-red-800">{item.reason}</p>
-                            </div>
-                            <div>
-                              <span className="text-red-600">Reported by:</span>
-                              <p className="font-medium text-red-800">{item.reportedBy}</p>
-                            </div>
-                            <div>
-                              <span className="text-red-600">Flagged:</span>
-                              <p className="font-medium text-red-800">{formatDate(item.flaggedAt)}</p>
-                            </div>
-                          </div>
-                          <div className="flex gap-3">
-                            <Link href={`/admin/investigate/${item.id}`}>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-green-600 text-green-600 bg-transparent"
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                Investigate
-                              </Button>
-                            </Link>
-                            <Button
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700"
-                              onClick={() => handleAction(item.id, "clear_flag")}
-                              disabled={actionLoading === item.id}
-                            >
-                              {actionLoading === item.id ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              ) : (
-                                <Check className="w-4 h-4 mr-2" />
-                              )}
-                              Clear Flag
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleAction(item.id, "remove")}
-                              disabled={actionLoading === item.id}
-                            >
-                              {actionLoading === item.id ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              ) : (
-                                <X className="w-4 h-4 mr-2" />
-                              )}
-                              Remove Item
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                {flaggedItems.length === 0 && (
-                  <div className="text-center py-8 text-green-600">No flagged items to review</div>
-                )}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="recent" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-green-800">Recent Admin Actions</h3>
-              <p className="text-sm text-green-600">Latest moderation activities</p>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-              </div>
-            ) : (
-              <Card className="border-green-200">
-                <CardContent className="p-0">
-                  <div className="divide-y divide-green-100">
-                    {recentActions.map((action) => (
-                      <div key={action.id} className="p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              action.action === "approved"
-                                ? "bg-green-100"
-                                : action.action === "rejected"
-                                  ? "bg-red-100"
-                                  : "bg-gray-100"
-                            }`}
-                          >
-                            {action.action === "approved" && <Check className="w-4 h-4 text-green-600" />}
-                            {action.action === "rejected" && <X className="w-4 h-4 text-red-600" />}
-                            {(action.action === "removed" || action.action === "cleared_flag") && (
-                              <AlertTriangle className="w-4 h-4 text-gray-600" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium text-green-800">
-                              <span
-                                className={`${
-                                  action.action === "approved"
-                                    ? "text-green-600"
-                                    : action.action === "rejected"
-                                      ? "text-red-600"
-                                      : "text-gray-600"
-                                }`}
-                              >
-                                {action.action.charAt(0).toUpperCase() + action.action.slice(1)}
-                              </span>{" "}
-                              "{action.itemTitle}"
-                            </p>
-                            <p className="text-sm text-green-600">by {action.adminName}</p>
-                          </div>
-                        </div>
-                        <span className="text-sm text-green-600">{formatDate(action.createdAt)}</span>
-                      </div>
-                    ))}
-                    {recentActions.length === 0 && (
-                      <div className="text-center py-8 text-green-600">No recent actions</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
             )}
           </TabsContent>
         </Tabs>
