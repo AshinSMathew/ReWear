@@ -163,7 +163,7 @@ export default function Dashboard() {
             >
               Logout
             </Button>
-            <Link href="#">
+            <Link href={`/profile/${data.user.id}`}>
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
                 <AvatarFallback className="bg-green-100 text-green-700">
