@@ -34,76 +34,27 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || 'pending';
-    const limit = Math.min(Number(searchParams.get('limit')) || 20, 100); // Add max limit
+    const limit = Math.min(Number(searchParams.get('limit')) || 20, 100); 
     const offset = Number(searchParams.get('offset')) || 0;
 
-    let items;
-    switch (status) {
-      case 'pending':
-        items = await db`
-          SELECT 
-            i.id,
-            i.title,
-            i.description,
-            i.category,
-            i.condition,
-            i.points_value as "pointsValue",
-            i.created_at as "createdAt",
-            u.name as "uploader",
-            u.id as "uploaderId",
-            (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "imageUrl"
-          FROM items i
-          JOIN users u ON i.user_id = u.id
-          WHERE i.status = 'pending'
-          ORDER BY i.created_at DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-        break;
-      
-      case 'flagged':
-        items = await db`
-          SELECT 
-            i.id,
-            i.title,
-            i.description,
-            u.name as "uploader",
-            u.id as "uploaderId",
-            r.reason,
-            r.reported_by as "reportedBy",
-            r.created_at as "flaggedAt",
-            (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "imageUrl"
-          FROM items i
-          JOIN users u ON i.user_id = u.id
-          JOIN reports r ON i.id = r.item_id
-          WHERE i.status = 'flagged'
-          ORDER BY r.created_at DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-        break;
-      
-      case 'recent':
-        items = await db`
-          SELECT 
-            a.id,
-            a.action,
-            a.created_at as "createdAt",
-            i.title as "itemTitle",
-            u.name as "adminName",
-            (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "itemImage"
-          FROM admin_actions a
-          JOIN items i ON a.item_id = i.id
-          JOIN users u ON a.admin_id = u.id
-          ORDER BY a.created_at DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-        break;
-      
-      default:
-        return NextResponse.json(
-          { error: "Invalid status parameter" },
-          { status: 400 }
-        );
-    }
+    const items = await db`
+      SELECT 
+        i.id,
+        i.title,
+        i.description,
+        i.category,
+        i.condition,
+        i.points_value as "pointsValue",
+        i.created_at as "createdAt",
+        u.name as "uploader",
+        u.id as "uploaderId",
+        (SELECT image_url FROM item_images WHERE item_id = i.id AND is_primary = true LIMIT 1) as "imageUrl"
+      FROM items i
+      JOIN users u ON i.user_id = u.id
+      WHERE i.status = 'pending'
+      ORDER BY i.created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
 
     return NextResponse.json({
       stats: {

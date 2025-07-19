@@ -46,7 +46,7 @@ export async function middleware(req: NextRequest) {
       if (protectedRoutes.includes(pathname) || pathname.startsWith('/admin')) {
         return NextResponse.redirect(new URL(`/auth/login?redirect=${pathname}`, req.url));
       }
-      return NextResponse.redirect(new URL("/browse", req.url));
+      return NextResponse.next();
     }
 
     const secretKey = new TextEncoder().encode(JWT_SECRET);

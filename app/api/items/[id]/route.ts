@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    // Extract ID from URL
     const url = new URL(request.url);
     const id = url.pathname.split('/').pop();
     

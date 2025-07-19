@@ -149,14 +149,21 @@ export default function Dashboard() {
                 List Item
               </Button>
             </Link>
+            <Button
+              variant="outline" 
+              className="border-green-600 text-green-600 hover:bg-green-50">
+              <Link href="/browse" className="text-green-700 hover:text-green-800 font-medium">
+                Browse Items
+              </Link>
+            </Button>
             <Button 
               variant="outline" 
-              className="border-green-600 text-green-600 hover:bg-green-50"
+              className="bg-green-600 hover:bg-green-700 text-white"
               onClick={handleLogout}
             >
               Logout
             </Button>
-            <Link href="#">
+            <Link href={`/profile/${data.user.id}`}>
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=40&width=40" />
                 <AvatarFallback className="bg-green-100 text-green-700">
