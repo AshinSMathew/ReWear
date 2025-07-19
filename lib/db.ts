@@ -8,7 +8,6 @@ export const db = neon(process.env.DATABASE_URL);
 
 const schema = async () => {
   try {
-    // Users Table (Combined for both regular users and admins)
     await db`
       CREATE TABLE IF NOT EXISTS USERS (
         id SERIAL PRIMARY KEY,
@@ -22,7 +21,6 @@ const schema = async () => {
       )
     `;
 
-    // Items Table
     await db`
       CREATE TABLE IF NOT EXISTS ITEMS (
         id SERIAL PRIMARY KEY,
@@ -41,7 +39,6 @@ const schema = async () => {
       )
     `;
 
-    // Images Table (Separate for multiple images per item)
     await db`
       CREATE TABLE IF NOT EXISTS ITEM_IMAGES (
         id SERIAL PRIMARY KEY,
@@ -52,7 +49,6 @@ const schema = async () => {
       )
     `;
 
-    // Swaps Table
     await db`
       CREATE TABLE IF NOT EXISTS SWAPS (
         id SERIAL PRIMARY KEY,
@@ -66,7 +62,6 @@ const schema = async () => {
       )
     `;
 
-    // Tags Table (Many-to-many with items)
     await db`
       CREATE TABLE IF NOT EXISTS TAGS (
         id SERIAL PRIMARY KEY,
@@ -74,7 +69,6 @@ const schema = async () => {
       )
     `;
 
-    // Item-Tags Junction Table
     await db`
       CREATE TABLE IF NOT EXISTS ITEM_TAGS (
         item_id INTEGER NOT NULL,
