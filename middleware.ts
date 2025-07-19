@@ -10,8 +10,20 @@ export async function middleware(req: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
 
   const publicRoutes = ['/auth/login', '/auth/signup', '/'];
-  const protectedRoutes = ['/browse', '/add-item', '/dashboard'];
+  const protectedRoutes = [
+    '/browse', 
+    '/add-item', 
+    '/dashboard',
+    '/profile',
+    '/profile/[id]',
+    '/items/[id]'
+  ];
   const adminRoutes = ['/admin'];
+
+  // Check if the path matches a protected dynamic route pattern
+  const isProtectedDynamicRoute = 
+    pathname.startsWith('/profile/') || 
+    pathname.startsWith('/items/');
 
   try {
     if (isAdminRoute) {
@@ -42,25 +54,28 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    if (!authToken) {
-      if (protectedRoutes.includes(pathname) || pathname.startsWith('/admin')) {
-        return NextResponse.redirect(new URL(`/auth/login?redirect=${pathname}`, req.url));
-      }
-      return NextResponse.next();
+    // Check for protected routes or dynamic protected routes
+    if (!authToken && (protectedRoutes.includes(pathname) || isProtectedDynamicRoute || pathname.startsWith('/admin'))) {
+      return NextResponse.redirect(new URL(`/auth/login?redirect=${pathname}`, req.url));
     }
 
-    const secretKey = new TextEncoder().encode(JWT_SECRET);
-    const { payload } = await jwtVerify(authToken, secretKey);
+    // If there's an authToken, verify it for protected routes
+    if (authToken && (protectedRoutes.includes(pathname) || isProtectedDynamicRoute)) {
+      const secretKey = new TextEncoder().encode(JWT_SECRET);
+      const { payload } = await jwtVerify(authToken, secretKey);
 
-    if (adminRoutes.includes(pathname) && !payload.isAdmin) {
-      const response = NextResponse.redirect(new URL("/", req.url));
-      response.cookies.set({
-        name: "authError",
-        value: "Admin access denied",
-        path: "/",
-        maxAge: 5
-      });
-      return response;
+      if (adminRoutes.includes(pathname) && !payload.isAdmin) {
+        const response = NextResponse.redirect(new URL("/", req.url));
+        response.cookies.set({
+          name: "authError",
+          value: "Admin access denied",
+          path: "/",
+          maxAge: 5
+        });
+        return response;
+      }
+
+      return NextResponse.next();
     }
 
     return NextResponse.next();
